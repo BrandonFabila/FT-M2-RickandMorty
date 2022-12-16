@@ -1,6 +1,8 @@
-(function () {
+//(function () {
 
-  window.whiteboard = new window.EventEmitter();
+  let EventEmitter = require('./event-emitter');
+  let whiteboard = new EventEmitter
+  //window.whiteboard = new window.EventEmitter();//llama a una instancia de algo definido, viene de event-emitter.js y se exporta white board
 
   // Ultimately, the color of our stroke;
   var color;
@@ -113,4 +115,8 @@
 
   };
 
-})();
+//})();
+
+
+
+module.exports = whiteboard;//se hace publico la composicion de event emiter

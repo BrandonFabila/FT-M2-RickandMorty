@@ -1,16 +1,18 @@
+"use strict";
+
 let url = 'http://localhost:5000/amigos';//array de amigos
 
 let showFriends = function(){//al hacer click
     $('#lista').empty();//para que no se llene la lista cada que aprietas
     $.get(`${url}`, function(friends) {//se obtiene el array completo 'url'
         friends.forEach(element => {//se itera sobre cada uno
-            $('#lista').append(`<li id="${element.id}">${element.name} X</li>`);//se apendea cada uno con su id mostrando el nombre
+            $('#lista').append(`<li id="${element.id}">${element.name}     <button id="${element.id}" onClick="deleteFriend(${element.id})"> X </button></li>`);//se apendea cada uno con su id mostrando el nombre
         });
     })
 }
 
 let getFriend = function(){
-    let id = $('input').val();//el valor del input
+    let id = $('#input').val();//el valor del input
     $('#lista').empty();
     if (id) {
         //http://localhost:5000/amigos/id
@@ -20,12 +22,22 @@ let getFriend = function(){
     }
 }
 
-let deleteFriend = function(){
-    let id = $('inputDelete').val();//el valor del input
+let deleteFriend = function(idButton){//el parametro es el id del boton
+    let id;
+
+    if (typeof idButton === 'number'){//
+        id = idButton;//si se preciona el boton se asigna el id del boton
+    } else {
+        id = $('#inputDelete').val();//el valor del input
+    }
+
+    
     let friend;
-    if (id) {   
-        $.get(`${url}/${id}`, function(f){
-            friend = f;
+
+    if (id) { 
+        
+        $.get(`${url}/${id}`, function(f){//obtiene el amigo
+            friend = f;//asigna a la variable
         });
 
         $.ajax({//comunica con servidor
@@ -33,7 +45,7 @@ let deleteFriend = function(){
             type: "DELETE",//accion de servidor
             success: function() {//completar 
                 $('#success').text(`Tu amigo, ${friend.name} fue eliminado`);
-                $('#inputDelete').val("");
+                $('#inputDelete').val("");//borra el id ingresado
                 showFriends();
             }
             
