@@ -1,15 +1,24 @@
-let traverseDomAndCollectElements = function(matchFunc, startEl) {
+let traverseDomAndCollectElements = function(matchFunc, startEl = document.body) { //startEl es el body del html 
   let resultSet = [];
 
-  if (typeof startEl === "undefined") {
+  /*if (typeof startEl === "undefined") {//si no se pasa parametro 
     startEl = document.body;
-  }
+  }*/
 
   // recorre el árbol del DOM y recolecta elementos que matchien en resultSet
   // usa matchFunc para identificar elementos que matchien
 
   // TU CÓDIGO AQUÍ
+  if (matchFunc(startEl)) {//si se encuentra
+    resultSet.push(startEl);
+  }
   
+  for (let i = 0; i < startEl.children.length; i++){
+    let aux = traverseDomAndCollectElements(matchFunc, startEl.children[i])//verifica cada hijo que busca
+    resultSet = [...resultSet, ...aux]//concatena asegurandose de no pisar los viejos por los nuevos del aux enviados 
+
+  }
+  return resultSet;
 };
 
 // Detecta y devuelve el tipo de selector
@@ -39,14 +48,28 @@ let selectorTypeMatcher = function(selector) {
 let matchFunctionMaker = function(selector) {
   let selectorType = selectorTypeMatcher(selector);
   let matchFunction;
+
   if (selectorType === "id") { 
     matchFunction = (elemento) => `#${elemento.id}` === selector;//true/false
-    
+
   } else if (selectorType === "class") {
-    
+    matchFunction = (elemento) => {
+      let classes = elemento.classList;//[] <---array con nombre de las clases del elemento
+      classes.forEach(el => { 
+        if (`.${el}` === selector) return true
+      });
+    return false
+    }
+
   } else if (selectorType === "tag.class") {
+    matchFunction = elemento => {
+      let [t, c] = selector.split('.'); //separa en el punto [t= tag, c= class]
+      return matchFunctionMaker(t)(elemento) && matchFunctionMaker(`.${c}`)(elemento);//se llama y pasa el tag 
+        // se llama dos veces una funcion distinta primero a matchfunctionmaker y despues a matchfunction
+    }
     
-  } else if (selectorType === "tag") {
+  } else if (selectorType === "tag") { 
+    matchFunction = (elemento) => elemento.tagName === selector.toUpperCase();
     
   }
   return matchFunction;
